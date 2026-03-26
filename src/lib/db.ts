@@ -1,14 +1,23 @@
-import Database from 'better-sqlite3';
-import path from 'path';
+import { Pool } from 'pg';
 
-// Construct the path to the database file
-const dbPath = path.join(process.cwd(), 'database.sqlite');
-
-let db: Database.Database;
+let pool: Pool;
 
 export function getDb() {
-  if (!db) {
-    db = new Database(dbPath, { verbose: console.log });
+  if (!pool) {
+    // Determine the connection string from Vercel/Supabase env variables
+    const connectionString = 
+      process.env.POSTGRES_URL_NON_POOLING || 
+      process.env.POSTGRES_URL || 
+      process.env.DATABASE_URL;
+
+    if (!connectionString) {
+      console.warn("No Postgres connection string found. Please set POSTGRES_URL or DATABASE_URL");
+    }
+
+    pool = new Pool({
+      connectionString,
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
+    });
   }
-  return db;
+  return pool;
 }

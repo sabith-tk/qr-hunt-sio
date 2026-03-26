@@ -10,8 +10,8 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
       return NextResponse.json({ error: 'Invalid claim_status' }, { status: 400 });
     }
 
-    const db = getDb();
-    db.prepare('UPDATE Winners SET claim_status = ? WHERE id = ?').run(claim_status ? 1 : 0, id);
+    const pool = getDb();
+    await pool.query('UPDATE Winners SET claim_status = $1 WHERE id = $2', [claim_status, id]);
 
     return NextResponse.json({ success: true });
   } catch (error) {
