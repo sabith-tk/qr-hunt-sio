@@ -1,5 +1,8 @@
 import { Pool } from 'pg';
 
+// Force Node.js to accept the Supabase SSL certificates natively
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 let pool: Pool;
 
 export function getDb() {
